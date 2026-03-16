@@ -22,10 +22,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Register F4 global hotkey (keyCode 118)
         registerF4HotKey()
 
-        // Request Screen Recording permission, then show overlay
-        requestScreenCapturePermission {
-            self.showOverlay()
-        }
+        // Request Screen Recording permission silently on launch (no overlay)
+        requestScreenCapturePermission {}
     }
 
     // MARK: - Screen Recording Permission
