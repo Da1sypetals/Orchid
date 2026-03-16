@@ -1,3 +1,5 @@
+# Orchid
+
 This repo is a macOS OCR tool called Orchid that uses local MLX vision-language models.
 
 
