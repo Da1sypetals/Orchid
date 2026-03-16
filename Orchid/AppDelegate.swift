@@ -1,13 +1,24 @@
 import AppKit
 import Carbon
+import Combine
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var overlayWindowController: OverlayWindowController?
     private var hotKeyRef: EventHotKeyRef?
+    private var config: OrchidConfig = OrchidConfig(
+        pythonPath: "",
+        preferredPort: 14416,
+        models: []
+    )
+    private var serverStateCancellable: AnyCancellable?
+    private var activeModelCancellable: AnyCancellable?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+
+        // Load config (auto-creates ~/.orchid/config.toml if absent)
+        config = OrchidConfig.load()
 
         // Create status bar item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -24,6 +35,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Request Screen Recording permission silently on launch (no overlay)
         requestScreenCapturePermission {}
+
+        // Subscribe to server state changes to refresh menu
+        serverStateCancellable = ServerManager.shared.$serverState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                // Menu is rebuilt on each open; no persistent reference to update
+                _ = self
+            }
+        activeModelCancellable = ServerManager.shared.$activeModel
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                _ = self
+            }
+
+        // Start the inference server
+        ServerManager.shared.start(model: config.defaultModel, config: config)
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        if let ref = hotKeyRef {
+            UnregisterEventHotKey(ref)
+        }
+        ServerManager.shared.stop()
     }
 
     // MARK: - Screen Recording Permission
@@ -63,13 +97,59 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showContextMenu() {
         let menu = NSMenu()
+        let serverManager = ServerManager.shared
+
+        // 截图识别
         menu.addItem(NSMenuItem(title: "截图识别", action: #selector(showOverlay), keyEquivalent: ""))
         menu.addItem(.separator())
+
+        // Model submenu
+        let modelMenuItem = NSMenuItem(title: "模型", action: nil, keyEquivalent: "")
+        let modelSubmenu = NSMenu(title: "模型")
+        let modelsDisabled = serverManager.serverState == .starting || serverManager.serverState == .stopping
+
+        for modelEntry in config.models {
+            let displayName = config.displayName(for: modelEntry.key)
+            let item = NSMenuItem(
+                title: displayName,
+                action: modelsDisabled ? nil : #selector(switchModel(_:)),
+                keyEquivalent: ""
+            )
+            item.representedObject = modelEntry.key
+            item.target = self
+            item.isEnabled = !modelsDisabled
+            if modelEntry.key == serverManager.activeModel {
+                item.state = .on
+            }
+            modelSubmenu.addItem(item)
+        }
+        modelMenuItem.submenu = modelSubmenu
+        menu.addItem(modelMenuItem)
+        menu.addItem(.separator())
+
+        // Server status (disabled, informational)
+        let statusTitle: String
+        switch serverManager.serverState {
+        case .stopped:
+            statusTitle = "服务器：已停止"
+        case .starting:
+            statusTitle = "服务器：启动中…"
+        case .running:
+            statusTitle = "服务器：运行中 :\(serverManager.activePort)"
+        case .stopping:
+            statusTitle = "服务器：停止中…"
+        }
+        let statusItem = NSMenuItem(title: statusTitle, action: nil, keyEquivalent: "")
+        statusItem.isEnabled = false
+        menu.addItem(statusItem)
+        menu.addItem(.separator())
+
         menu.addItem(NSMenuItem(title: "清空图片缓存", action: #selector(clearCache), keyEquivalent: ""))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "退出 Orchid", action: #selector(quitApp), keyEquivalent: "q"))
-        statusItem?.menu = menu
-        statusItem?.button?.performClick(nil)
+
+        self.statusItem?.menu = menu
+        self.statusItem?.button?.performClick(nil)
         // Remove menu so next left-click triggers action directly
         DispatchQueue.main.async { self.statusItem?.menu = nil }
     }
@@ -79,10 +159,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             requestScreenCapturePermission {}
             return
         }
+
+        guard ServerManager.shared.serverState == .running else {
+            let alert = NSAlert()
+            alert.messageText = "服务器尚未就绪"
+            alert.informativeText = "推理服务器正在启动中，请稍候再试。"
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "好")
+            NSApp.activate(ignoringOtherApps: true)
+            alert.runModal()
+            return
+        }
+
         if overlayWindowController == nil {
             overlayWindowController = OverlayWindowController()
         }
         overlayWindowController?.showOverlay()
+    }
+
+    @objc func switchModel(_ sender: NSMenuItem) {
+        guard let key = sender.representedObject as? String else { return }
+        ServerManager.shared.switchModel(to: key, config: config)
     }
 
     @objc func quitApp() {
@@ -128,11 +225,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             Unmanaged.passUnretained(self).toOpaque(),
             nil
         )
-    }
-
-    func applicationWillTerminate(_ notification: Notification) {
-        if let ref = hotKeyRef {
-            UnregisterEventHotKey(ref)
-        }
     }
 }

@@ -13,8 +13,12 @@ private struct StreamChunk: Decodable {
 
 // MARK: - OCR Client
 enum OCRClient {
-    static let endpoint = URL(string: "http://127.0.0.1:8080/chat/completions")!
-    static let model = "mlx-community/GLM-OCR-bf16"
+    static var endpoint: URL {
+        URL(string: "http://127.0.0.1:\(ServerManager.shared.activePort)/chat/completions")!
+    }
+    static var modelName: String {
+        ServerManager.shared.activeModelPath
+    }
     static let prompt = """
         Recognize the text in the image and output in Markdown format. \
         Preserve the original layout (headings/paragraphs/tables/formulas). \
@@ -50,7 +54,7 @@ enum OCRClient {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: Any] = [
-            "model": model,
+            "model": modelName,
             "stream": true,
             "max_tokens": 4096,
             "temperature": 0.01,

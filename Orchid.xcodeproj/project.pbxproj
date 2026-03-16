@@ -16,6 +16,9 @@
 		AA000001000000000000007 /* ResultPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000007 /* ResultPanelController.swift */; };
 		AA000001000000000000010 /* CacheManagerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000010 /* CacheManagerController.swift */; };
 		AA000001000000000000011 /* OrchidIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000011 /* OrchidIcon.swift */; };
+		AA000001000000000000012 /* OrchidConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000012 /* OrchidConfig.swift */; };
+		AA000001000000000000013 /* ServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000013 /* ServerManager.swift */; };
+		AA000001000000000000014 /* TOMLKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA000012000000000000001 /* TOMLKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +33,8 @@
 		AA000002000000000000009 /* Orchid.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Orchid.entitlements; sourceTree = "<group>"; };
 		AA000002000000000000010 /* CacheManagerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManagerController.swift; sourceTree = "<group>"; };
 		AA000002000000000000011 /* OrchidIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrchidIcon.swift; sourceTree = "<group>"; };
+		AA000002000000000000012 /* OrchidConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrchidConfig.swift; sourceTree = "<group>"; };
+		AA000002000000000000013 /* ServerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerManager.swift; sourceTree = "<group>"; };
 		AA000003000000000000001 /* Orchid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orchid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -38,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA000001000000000000014 /* TOMLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,6 +64,8 @@
 				AA000002000000000000009 /* Orchid.entitlements */,
 				AA000002000000000000010 /* CacheManagerController.swift */,
 				AA000002000000000000011 /* OrchidIcon.swift */,
+				AA000002000000000000012 /* OrchidConfig.swift */,
+				AA000002000000000000013 /* ServerManager.swift */,
 			);
 			path = Orchid;
 			sourceTree = "<group>";
@@ -94,6 +102,9 @@
 			dependencies = (
 			);
 			name = Orchid;
+			packageProductDependencies = (
+				AA000012000000000000001 /* TOMLKit */,
+			);
 			productName = Orchid;
 			productReference = AA000003000000000000001 /* Orchid.app */;
 			productType = "com.apple.product-type.application";
@@ -122,6 +133,9 @@
 				Base,
 			);
 			mainGroup = AA000005000000000000003;
+			packageReferences = (
+				AA000013000000000000001 /* XCRemoteSwiftPackageReference "TOMLKit" */,
+			);
 			productRefGroup = AA000005000000000000002 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -155,10 +169,32 @@
 				AA000001000000000000007 /* ResultPanelController.swift in Sources */,
 				AA000001000000000000010 /* CacheManagerController.swift in Sources */,
 				AA000001000000000000011 /* OrchidIcon.swift in Sources */,
+				AA000001000000000000012 /* OrchidConfig.swift in Sources */,
+				AA000001000000000000013 /* ServerManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA000013000000000000001 /* XCRemoteSwiftPackageReference "TOMLKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LebJe/TOMLKit";
+			requirement = {
+				kind = versionRange;
+				minimumVersion = 0.6.0;
+				maximumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA000012000000000000001 /* TOMLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA000013000000000000001 /* XCRemoteSwiftPackageReference "TOMLKit" */;
+			productName = TOMLKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AA000010000000000000001 /* Debug */ = {
