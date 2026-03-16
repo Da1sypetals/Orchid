@@ -15,6 +15,7 @@
 		AA000001000000000000006 /* OCRClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000006 /* OCRClient.swift */; };
 		AA000001000000000000007 /* ResultPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000007 /* ResultPanelController.swift */; };
 		AA000001000000000000010 /* CacheManagerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000010 /* CacheManagerController.swift */; };
+		AA000001000000000000011 /* OrchidIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000011 /* OrchidIcon.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		AA000002000000000000008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA000002000000000000009 /* Orchid.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Orchid.entitlements; sourceTree = "<group>"; };
 		AA000002000000000000010 /* CacheManagerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManagerController.swift; sourceTree = "<group>"; };
+		AA000002000000000000011 /* OrchidIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrchidIcon.swift; sourceTree = "<group>"; };
 		AA000003000000000000001 /* Orchid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orchid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -55,6 +57,7 @@
 				AA000002000000000000008 /* Info.plist */,
 				AA000002000000000000009 /* Orchid.entitlements */,
 				AA000002000000000000010 /* CacheManagerController.swift */,
+				AA000002000000000000011 /* OrchidIcon.swift */,
 			);
 			path = Orchid;
 			sourceTree = "<group>";
@@ -151,6 +154,7 @@
 				AA000001000000000000006 /* OCRClient.swift in Sources */,
 				AA000001000000000000007 /* ResultPanelController.swift in Sources */,
 				AA000001000000000000010 /* CacheManagerController.swift in Sources */,
+				AA000001000000000000011 /* OrchidIcon.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

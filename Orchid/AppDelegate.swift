@@ -12,9 +12,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Create status bar item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem?.button {
-            button.image = NSImage(systemSymbolName: "text.viewfinder", accessibilityDescription: "Orchid OCR")
+            button.image = OrchidIcon.image(size: 18)
+            button.image?.isTemplate = false
             button.action = #selector(statusButtonClicked(_:))
-            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+            button.sendAction(on: [.leftMouseUp])
             button.target = self
         }
 
@@ -56,15 +57,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // MARK: - Status Button (left = overlay, right = menu)
+    // MARK: - Status Button (left = menu)
 
     @objc func statusButtonClicked(_ sender: NSStatusBarButton) {
-        let event = NSApp.currentEvent!
-        if event.type == .rightMouseUp {
-            showContextMenu()
-        } else {
-            showOverlay()
-        }
+        showContextMenu()
     }
 
     private func showContextMenu() {
