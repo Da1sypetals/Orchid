@@ -38,16 +38,21 @@ enum OCRClient {
         Do not fabricate content that does not exist in the image.
         """
 
+    @discardableResult
     static func recognize(
         imageURL: URL,
         mode: OCRMode = .markdown,
         onChunk: @escaping @MainActor (String) -> Void,
         onComplete: @escaping @MainActor (Error?) -> Void
-    ) {
+    ) -> Task<Void, Never> {
         Task {
             do {
                 try await streamOCR(imageURL: imageURL, mode: mode, onChunk: onChunk)
                 await MainActor.run { onComplete(nil) }
+            } catch is CancellationError {
+                // cancelled cleanly — no error shown
+            } catch let urlError as URLError where urlError.code == .cancelled {
+                // URLSession translates task cancellation to URLError.cancelled — no error shown
             } catch {
                 await MainActor.run { onComplete(error) }
             }

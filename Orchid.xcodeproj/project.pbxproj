@@ -19,6 +19,8 @@
 		AA000001000000000000012 /* OrchidConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000012 /* OrchidConfig.swift */; };
 		AA000001000000000000013 /* ServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000013 /* ServerManager.swift */; };
 		AA000001000000000000014 /* TOMLKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA000012000000000000001 /* TOMLKit */; };
+		AA000001000000000000015 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000015 /* Assets.xcassets */; };
+		AA000001000000000000016 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000016 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +37,8 @@
 		AA000002000000000000011 /* OrchidIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrchidIcon.swift; sourceTree = "<group>"; };
 		AA000002000000000000012 /* OrchidConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrchidConfig.swift; sourceTree = "<group>"; };
 		AA000002000000000000013 /* ServerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerManager.swift; sourceTree = "<group>"; };
+		AA000002000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA000002000000000000016 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		AA000003000000000000001 /* Orchid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orchid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -66,6 +70,8 @@
 				AA000002000000000000011 /* OrchidIcon.swift */,
 				AA000002000000000000012 /* OrchidConfig.swift */,
 				AA000002000000000000013 /* ServerManager.swift */,
+				AA000002000000000000015 /* Assets.xcassets */,
+				AA000002000000000000016 /* AppIcon.icns */,
 			);
 			path = Orchid;
 			sourceTree = "<group>";
@@ -150,6 +156,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA000001000000000000015 /* Assets.xcassets in Resources */,
+				AA000001000000000000016 /* AppIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,6 +337,8 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ICON_FILE = AppIcon.icns;
 				PRODUCT_BUNDLE_IDENTIFIER = com.orchid.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -353,6 +363,8 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ICON_FILE = AppIcon.icns;
 				PRODUCT_BUNDLE_IDENTIFIER = com.orchid.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -13,16 +13,15 @@ struct OrchidConfig {
             .appendingPathComponent(".orchid")
         let file = dir.appendingPathComponent("config.toml")
 
-        if !FileManager.default.fileExists(atPath: file.path) {
-            try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            writeDefaults(to: file)
-        }
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        applyDefaults(to: file)
 
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
         let contents = try! String(contentsOf: file, encoding: .utf8)
         let table = try! TOMLTable(string: contents)
 
         let pythonPath = table["mlx-vlm-python"]?.string
-            ?? "/Users/daisy/develop/GLM-OCR/.venv-mlx/bin/python"
+            ?? "\(home)/.orchid/.venv/bin/python"
         let preferredPort = table["port"]?.int ?? 14416
 
         var models: [(key: String, path: String)] = []
@@ -36,24 +35,51 @@ struct OrchidConfig {
 
         if models.isEmpty {
             models = [
-                (key: "glm-ocr", path: "/Users/daisy/develop/GLM-OCR/models/GLM-OCR-bf16"),
-                (key: "paddle-ocr", path: "/Users/daisy/develop/GLM-OCR/models/PaddleOCR-VL-1.5-bf16"),
+                (key: "glm-ocr", path: "\(home)/.orchid/models/GLM-OCR-bf16"),
+                (key: "paddle-ocr", path: "\(home)/.orchid/models/PaddleOCR-VL-1.5-bf16"),
             ]
         }
 
         return OrchidConfig(pythonPath: pythonPath, preferredPort: preferredPort, models: models)
     }
 
-    static func writeDefaults(to url: URL) {
-        let template = """
-            mlx-vlm-python = "/Users/daisy/develop/GLM-OCR/.venv-mlx/bin/python"
-            port = 14416
+    static func applyDefaults(to url: URL) {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
 
-            [model-path]
-            glm-ocr = "/Users/daisy/develop/GLM-OCR/models/GLM-OCR-bf16"
-            paddle-ocr = "/Users/daisy/develop/GLM-OCR/models/PaddleOCR-VL-1.5-bf16"
-            """
-        try! template.write(to: url, atomically: true, encoding: .utf8)
+        var existingPython: String? = nil
+        var existingPort: Int? = nil
+        var existingModels: [String: String] = [:]
+        let fileExists = FileManager.default.fileExists(atPath: url.path)
+
+        if fileExists {
+            let contents = try! String(contentsOf: url, encoding: .utf8)
+            let table = try! TOMLTable(string: contents)
+            existingPython = table["mlx-vlm-python"]?.string
+            existingPort = table["port"]?.int
+            if let mt = table["model-path"]?.table {
+                for (k, v) in mt {
+                    if let s = v.string { existingModels[k] = s }
+                }
+            }
+        }
+
+        let needsGlm = existingModels["glm-ocr"] == nil
+        let needsPaddle = existingModels["paddle-ocr"] == nil
+        let needsWrite = !fileExists || existingPython == nil || existingPort == nil || needsGlm || needsPaddle
+
+        guard needsWrite else { return }
+
+        let finalPython = existingPython ?? "\(home)/.orchid/.venv/bin/python"
+        let finalPort = existingPort ?? 14416
+        if needsGlm { existingModels["glm-ocr"] = "\(home)/.orchid/models/GLM-OCR-bf16" }
+        if needsPaddle { existingModels["paddle-ocr"] = "\(home)/.orchid/models/PaddleOCR-VL-1.5-bf16" }
+
+        var toml = "mlx-vlm-python = \"\(finalPython)\"\nport = \(finalPort)\n\n[model-path]\n"
+        for (key, path) in existingModels.sorted(by: { $0.key < $1.key }) {
+            toml += "\(key) = \"\(path)\"\n"
+        }
+
+        try! toml.write(to: url, atomically: true, encoding: .utf8)
     }
 
     func modelPath(for key: String) -> String? {
