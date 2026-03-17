@@ -107,7 +107,7 @@ final class ServerManager: ObservableObject {
                 // Wait up to 5s for graceful exit
                 let deadline = Date().addingTimeInterval(5)
                 while p.isRunning && Date() < deadline {
-                    Thread.sleep(forTimeInterval: 0.1)
+                    try? await Task.sleep(nanoseconds: 100_000_000)
                 }
                 if p.isRunning {
                     p.interrupt()   // SIGKILL equivalent via Process

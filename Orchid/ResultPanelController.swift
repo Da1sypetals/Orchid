@@ -45,7 +45,7 @@ final class SearchState: ObservableObject {
 /// Renders OCR text with search matches highlighted via AttributedString.
 struct HighlightedText: View {
     let text: String
-    let search: SearchState
+    @ObservedObject var search: SearchState
 
     private var highlightColor: Color { Color(red: 0xed/255, green: 0x8e/255, blue: 0xa9/255).opacity(0.45) }
     private var focusColor: Color    { Color(red: 0xed/255, green: 0x8e/255, blue: 0xa9/255).opacity(0.9) }
@@ -60,7 +60,6 @@ struct HighlightedText: View {
     private var attributed: AttributedString {
         var result = AttributedString(text)
         guard search.isVisible && !search.query.isEmpty else { return result }
-        let options: String.CompareOptions = search.caseSensitive ? [] : .caseInsensitive
         for (i, range) in search.matches.enumerated() {
             if let attrRange = Range(range, in: result) {
                 result[attrRange].backgroundColor = i == search.focusedMatch ? UIColorBridge.focus : UIColorBridge.highlight
@@ -75,12 +74,60 @@ private enum UIColorBridge {
     static let focus     = Color(red: 0xed/255, green: 0x8e/255, blue: 0xa9/255).opacity(0.9)
 }
 
+// MARK: - Search TextField (NSViewRepresentable)
+/// Intercepts Return and Shift+Return to navigate matches.
+private struct SearchTextField: NSViewRepresentable {
+    @Binding var text: String
+    var onNext: () -> Void
+    var onPrev: () -> Void
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    func makeNSView(context: Context) -> NSTextField {
+        let field = NSTextField()
+        field.placeholderString = "Search…"
+        field.isBordered = false
+        field.drawsBackground = false
+        field.font = .systemFont(ofSize: 13)
+        field.focusRingType = .none
+        field.delegate = context.coordinator
+        return field
+    }
+
+    func updateNSView(_ field: NSTextField, context: Context) {
+        if field.stringValue != text {
+            field.stringValue = text
+        }
+        // Grab focus on first appearance
+        if text.isEmpty {
+            DispatchQueue.main.async { field.window?.makeFirstResponder(field) }
+        }
+    }
+
+    final class Coordinator: NSObject, NSTextFieldDelegate {
+        var parent: SearchTextField
+        init(_ parent: SearchTextField) { self.parent = parent }
+
+        func controlTextDidChange(_ obj: Notification) {
+            guard let field = obj.object as? NSTextField else { return }
+            parent.text = field.stringValue
+        }
+
+        func control(_ control: NSControl, textView: NSTextView, doCommandBy selector: Selector) -> Bool {
+            if selector == #selector(NSResponder.insertNewline(_:)) {
+                let shiftDown = NSApp.currentEvent?.modifierFlags.contains(.shift) ?? false
+                if shiftDown { parent.onPrev() } else { parent.onNext() }
+                return true
+            }
+            return false
+        }
+    }
+}
+
 // MARK: - Search Bar
 struct SearchBar: View {
     @ObservedObject var search: SearchState
     var onClose: () -> Void
-
-    @FocusState private var fieldFocused: Bool
 
     var body: some View {
         HStack(spacing: 6) {
@@ -88,11 +135,12 @@ struct SearchBar: View {
                 .foregroundColor(.secondary)
                 .font(.system(size: 12))
 
-            TextField("Search…", text: $search.query)
-                .textFieldStyle(.plain)
-                .font(.system(size: 13))
-                .focused($fieldFocused)
-                .onSubmit { search.next() }
+            SearchTextField(
+                text: $search.query,
+                onNext: { search.next() },
+                onPrev: { search.prev() }
+            )
+            .frame(maxWidth: .infinity)
 
             if !search.matches.isEmpty {
                 Text("\(search.focusedMatch + 1)/\(search.matches.count)")
@@ -134,8 +182,6 @@ struct SearchBar: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        // Auto-focus the text field whenever the search bar appears
-        .onAppear { fieldFocused = true }
     }
 }
 
