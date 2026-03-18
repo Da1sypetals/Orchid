@@ -22,11 +22,8 @@ enum OrchidIcon {
         ctx.translateBy(x: 0, y: rect.height)
         ctx.scaleBy(x: s, y: -s)
 
-        // Detect dark mode — use a tinted fill in dark, the original purple in light
-        let isDark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        let fill = isDark
-            ? NSColor(red: 0xed/255, green: 0x8e/255, blue: 0xa9/255, alpha: 1)  // accent pink
-            : NSColor(red: 0xC9/255, green: 0xB8/255, blue: 0xE8/255, alpha: 1)  // original lavender
+        // Always use accent pink regardless of appearance
+        let fill = NSColor(red: 0xed/255, green: 0x8e/255, blue: 0xa9/255, alpha: 1)
 
         fill.setFill()
 
