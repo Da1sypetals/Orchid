@@ -1,6 +1,15 @@
-# Orchid
+<p align="center">
+  <br>
+  <img src="orchid.svg" alt="Lockpaw mascot" width="200" />
+  <br>
+</p>
 
-This repo is a macOS OCR tool called Orchid that uses local MLX vision-language models.
+<h1 align="center">Orchid</h1>
+
+<p align="center">
+  <strong>Screenshot then OCR, seamlessly</strong><br>
+</p>
+
 
 
 ## Build
@@ -11,9 +20,10 @@ xcodebuild -project Orchid.xcodeproj -scheme Orchid -destination 'platform=macOS
 ```
 
 
-## Config file
+## Configure
 
-~/.orchid/config.toml is auto-created on first launch:
+Configure your python interpreter path and model checkpoint paths in `~/.orchid/config.toml`.
+
 
 ```toml
 mlx-vlm-python = "/Users/daisy/develop/GLM-OCR/.venv-mlx/bin/python"
