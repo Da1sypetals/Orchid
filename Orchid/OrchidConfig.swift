@@ -2,6 +2,10 @@ import Foundation
 import TOMLKit
 
 struct OrchidConfig {
+    /// Model keys that the current OCR backend (glm-ocr-rs) supports.
+    /// Config entries with keys not in this set are ignored.
+    static let supportedModelKeys: Set<String> = ["glm-ocr"]
+
     var ocrBinPath: String
     var preferredPort: Int
     var models: [(key: String, path: String)]
@@ -27,7 +31,7 @@ struct OrchidConfig {
         var models: [(key: String, path: String)] = []
         if let modelTable = table["model-path"]?.table {
             for (key, value) in modelTable {
-                if let path = value.string {
+                if let path = value.string, supportedModelKeys.contains(key) {
                     models.append((key: key, path: path))
                 }
             }
